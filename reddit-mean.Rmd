@@ -1,0 +1,92 @@
+---
+title: "Average Reddit Submission Score by Title Length, by Subreddit"
+author: "Max Woolf (@minimaxir)"
+date: "2019-11-11"
+
+---
+
+## Setup
+
+```{r}
+library(tidyverse)
+library(scales)
+
+sessionInfo()
+```
+
+```{r}
+theme_set(theme_minimal(base_size=9, base_family="Source Sans Pro") +
+            theme(plot.title = element_text(family="Source Sans Pro Bold", margin=margin(t = -0.1, b = 0.1, unit='cm'), size=12),
+                  axis.title.x = element_text(),
+                  axis.title.y = element_text(),
+                  axis.text.y = element_text(family="Roboto Condensed"),
+                  axis.text.x = element_text(family="Roboto Condensed"),
+                  plot.subtitle = element_text(family="Source Sans Pro Semibold", color="#969696", size=8),
+                  plot.caption = element_text(color="#969696"),
+                  legend.title = element_text(),
+                  legend.key.width = unit(0.25, unit='cm')))
+```
+
+# EDA
+
+```{r}
+df <- read_csv('results-20191111-074054.csv')
+```
+
+
+```{r}
+plot <-
+  ggplot(df,
+         aes(
+           x = title_length,
+           y = avg_score,
+           color = subreddit
+         )) +
+  geom_hline(yintercept=0, color="gray", size=0.5) +
+  geom_point(stat = "identity", size=0.3) +
+  geom_smooth(alpha=0, color="#1a1a1a", size=0.3) +
+  scale_color_hue(l=50, guide=F) +
+  scale_x_continuous(breaks=seq(0, 300, 50)) +
+  scale_y_continuous(labels=comma) +
+  labs(
+    title = "Average Reddit Submission Score by Title Length, by Subreddit",
+    subtitle = "via Pushshift/BigQuery. Title data from Jan 2017 to Aug 2019",
+    x = 'Title Length (Characters)',
+    y = 'Average Score for Submissions with Title Length',
+    fill = '',
+    caption = 'Max Woolf — minimaxir.com'
+  ) +
+  facet_wrap(~ subreddit, ncol=10, scales="free_y") +
+  theme(strip.text = element_text(size=5.5),
+        axis.text.x = element_text(size=4))
+
+ggsave('avg_score_subreddit.png',
+       plot,
+       width = 10,
+       height = 6)
+```
+
+
+# LICENSE
+
+MIT License
+
+Copyright (c) 2019 Max Woolf
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
